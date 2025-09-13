@@ -5,6 +5,7 @@ import 'package:rick_and_morty_wiki/characters/domain/character_entity.dart';
 import 'package:rick_and_morty_wiki/core/app_routes.dart';
 import 'package:rick_and_morty_wiki/core/infra/service_locator.dart';
 import 'package:rick_and_morty_wiki/characters/domain/characters_use_cases.dart';
+import 'package:rick_and_morty_wiki/core/theme/app_typography.dart';
 
 class CharactersListPage extends HookWidget {
   const CharactersListPage({super.key});
@@ -77,7 +78,7 @@ class CharactersListPage extends HookWidget {
               height: 48,
               fit: BoxFit.cover,
             ),
-            title: Text(character.name),
+            title: Text(character.name, style: AppTypography.medium20),
             subtitle: Text('${character.species} - ${character.status}'),
           );
         },

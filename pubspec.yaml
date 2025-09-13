@@ -13,6 +13,9 @@ dependencies:
   get_it: ^8.2.0
   fquery: ^1.5.4-beta.2
   flutter_hooks: ^0.21.3+1
+  flutter_svg: ^2.2.1
+  google_fonts: ^6.3.1
+  flutter_native_splash: ^2.4.6
 
 dev_dependencies:
   flutter_test:
@@ -21,3 +24,16 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/
+
+flutter_native_splash:
+  color: "#0F3A40"
+  image: assets/rick_and_morty_logo.png
+  fullscreen: true
+  android: true
+  ios: true
+  android_12:
+    color: "#0F3A40"
+    image: null
+
