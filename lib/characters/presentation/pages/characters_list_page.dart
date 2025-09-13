@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
 import 'package:rick_and_morty_wiki/characters/domain/character_entity.dart';
+import 'package:rick_and_morty_wiki/core/app_routes.dart';
 import 'package:rick_and_morty_wiki/core/infra/service_locator.dart';
 import 'package:rick_and_morty_wiki/characters/domain/characters_use_cases.dart';
 
-class CharacterListPage extends HookWidget {
-  const CharacterListPage({super.key});
+class CharactersListPage extends HookWidget {
+  const CharactersListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +23,10 @@ class CharacterListPage extends HookWidget {
 
     useEffect(() {
       void onScroll() {
-        if (charactersQuery.isFetchingNextPage || !charactersQuery.hasNextPage)
+        if (charactersQuery.isFetchingNextPage ||
+            !charactersQuery.hasNextPage) {
           return;
+        }
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 100) {
           charactersQuery.fetchNextPage();
@@ -66,6 +69,8 @@ class CharacterListPage extends HookWidget {
           }
           final character = allCharacters[index];
           return ListTile(
+            onTap: () =>
+                Navigator.pushNamed(context, AppRoutes.characterDetails),
             leading: Image.network(
               character.image,
               width: 48,

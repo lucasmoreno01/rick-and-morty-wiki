@@ -11,7 +11,12 @@ class _CharacterDetailsState extends State<CharacterDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Text('Page works'),
+      body: Center(
+        child: Text(
+          'Page works',
+          style: TextStyle(color: Colors.black, fontSize: 20),
+        ),
+      ),
     );
   }
 }
