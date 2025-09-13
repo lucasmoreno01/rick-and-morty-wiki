@@ -1,7 +1,9 @@
+import 'package:rick_and_morty_wiki/characters/domain/charater_status.dart';
+
 class CharacterEntity {
   final int id;
   final String name;
-  final String status;
+  final CharacterStatus status;
   final String species;
   final String type;
   final String gender;

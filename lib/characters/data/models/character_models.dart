@@ -1,4 +1,5 @@
 import 'package:rick_and_morty_wiki/characters/domain/character_entity.dart';
+import 'package:rick_and_morty_wiki/characters/domain/charater_status.dart';
 
 class CharacterLocationModel extends CharacterLocationEntity {
   CharacterLocationModel({
@@ -41,7 +42,7 @@ class CharacterModel extends CharacterEntity {
     return CharacterModel(
       id: json['id'],
       name: json['name'],
-      status: json['status'],
+      status: CharacterStatus.values.byName(json['status']),
       species: json['species'],
       type: json['type'],
       gender: json['gender'],
