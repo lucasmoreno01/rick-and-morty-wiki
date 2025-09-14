@@ -6,6 +6,7 @@ import 'package:rick_and_morty_wiki/characters/domain/character_entity.dart';
 import 'package:rick_and_morty_wiki/characters/presentation/widgets/character_card.dart';
 import 'package:rick_and_morty_wiki/core/infra/service_locator.dart';
 import 'package:rick_and_morty_wiki/characters/domain/characters_use_cases.dart';
+import 'package:rick_and_morty_wiki/core/theme/app_typography.dart';
 import 'package:rick_and_morty_wiki/core/theme/color_theme.dart';
 
 class CharactersListPage extends HookWidget {
@@ -59,28 +60,53 @@ class CharactersListPage extends HookWidget {
         centerTitle: true,
       ),
       backgroundColor: ColorTheme.background,
-      body: GridView.builder(
+      body: CustomScrollView(
         controller: scrollController,
-        padding: const EdgeInsets.all(16),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 0.8,
-        ),
-        itemCount: allCharacters.length + 1,
-        itemBuilder: (_, index) {
-          if (index == allCharacters.length) {
-            if (charactersQuery.hasNextPage) {
-              charactersQuery.fetchNextPage();
-              return const Center(child: CircularProgressIndicator());
-            } else {
-              return const SizedBox.shrink();
-            }
-          }
-          final character = allCharacters[index];
-          return CharacterCard(character: character);
-        },
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Todos os Personagens",
+                    style: AppTypography.bold22.copyWith(
+                      color: ColorTheme.tertiary,
+                    ),
+                  ),
+                  Text(
+                    "Favoritos",
+                    style: AppTypography.bold22.copyWith(color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.all(16),
+            sliver: SliverGrid(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                if (index == allCharacters.length) {
+                  if (charactersQuery.hasNextPage) {
+                    charactersQuery.fetchNextPage();
+                    return const Center(child: CircularProgressIndicator());
+                  } else {
+                    return const SizedBox.shrink();
+                  }
+                }
+                final character = allCharacters[index];
+                return CharacterCard(character: character);
+              }, childCount: allCharacters.length + 1),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.8,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
