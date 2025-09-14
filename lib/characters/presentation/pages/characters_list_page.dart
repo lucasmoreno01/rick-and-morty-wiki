@@ -6,6 +6,7 @@ import 'package:rick_and_morty_wiki/characters/domain/character_entity.dart';
 import 'package:rick_and_morty_wiki/characters/presentation/widgets/character_card.dart';
 import 'package:rick_and_morty_wiki/core/infra/service_locator.dart';
 import 'package:rick_and_morty_wiki/characters/domain/characters_use_cases.dart';
+import 'package:rick_and_morty_wiki/core/infra/favorites_service.dart';
 import 'package:rick_and_morty_wiki/core/theme/app_typography.dart';
 import 'package:rick_and_morty_wiki/core/theme/color_theme.dart';
 
@@ -24,6 +25,9 @@ class CharactersListPage extends HookWidget {
           initialPageParam: 1,
         );
 
+    final showFavorites = useState(false);
+    final favorites = useState<List<int>>([]);
+
     useEffect(() {
       void onScroll() {
         if (charactersQuery.isFetchingNextPage ||
@@ -40,6 +44,15 @@ class CharactersListPage extends HookWidget {
       return () => scrollController.removeListener(onScroll);
     }, [scrollController, charactersQuery]);
 
+    useEffect(() {
+      if (showFavorites.value) {
+        sl<FavoritesService>().getFavorites().then((ids) {
+          favorites.value = ids;
+        });
+      }
+      return null;
+    }, [showFavorites.value]);
+
     if (charactersQuery.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -52,6 +65,10 @@ class CharactersListPage extends HookWidget {
 
     final allCharacters =
         charactersQuery.data?.pages.expand((p) => p).toList() ?? [];
+
+    final charactersToShow = showFavorites.value
+        ? allCharacters.where((c) => favorites.value.contains(c.id)).toList()
+        : allCharacters;
 
     return Scaffold(
       appBar: AppBar(
@@ -69,15 +86,27 @@ class CharactersListPage extends HookWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    "Todos os Personagens",
-                    style: AppTypography.bold22.copyWith(
-                      color: ColorTheme.tertiary,
+                  GestureDetector(
+                    onTap: () => showFavorites.value = false,
+                    child: Text(
+                      "Todos os Personagens",
+                      style: AppTypography.bold22.copyWith(
+                        color: showFavorites.value
+                            ? Colors.white70
+                            : ColorTheme.tertiary,
+                      ),
                     ),
                   ),
-                  Text(
-                    "Favoritos",
-                    style: AppTypography.bold22.copyWith(color: Colors.white),
+                  GestureDetector(
+                    onTap: () => showFavorites.value = true,
+                    child: Text(
+                      "Favoritos",
+                      style: AppTypography.bold22.copyWith(
+                        color: showFavorites.value
+                            ? ColorTheme.tertiary
+                            : Colors.white,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -85,26 +114,52 @@ class CharactersListPage extends HookWidget {
           ),
           SliverPadding(
             padding: const EdgeInsets.all(16),
-            sliver: SliverGrid(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                if (index == allCharacters.length) {
-                  if (charactersQuery.hasNextPage) {
-                    charactersQuery.fetchNextPage();
-                    return const Center(child: CircularProgressIndicator());
-                  } else {
-                    return const SizedBox.shrink();
-                  }
-                }
-                final character = allCharacters[index];
-                return CharacterCard(character: character);
-              }, childCount: allCharacters.length + 1),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 0.8,
-              ),
-            ),
+            sliver: charactersToShow.isEmpty
+                ? SliverToBoxAdapter(
+                    child: Center(
+                      child: Text(
+                        'Nenhum personagem salvo como favorito',
+                        style: AppTypography.medium20.copyWith(
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  )
+                : SliverGrid(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        if (!showFavorites.value &&
+                            index == charactersToShow.length) {
+                          if (charactersQuery.hasNextPage) {
+                            charactersQuery.fetchNextPage();
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else {
+                            return const SizedBox.shrink();
+                          }
+                        }
+
+                        if (index >= charactersToShow.length) {
+                          return const SizedBox.shrink();
+                        }
+
+                        final character = charactersToShow[index];
+                        return CharacterCard(character: character);
+                      },
+                      childCount:
+                          charactersToShow.length +
+                          (showFavorites.value ? 0 : 1),
+                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 0.8,
+                        ),
+                  ),
           ),
         ],
       ),

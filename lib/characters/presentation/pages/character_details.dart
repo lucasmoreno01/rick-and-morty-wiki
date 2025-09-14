@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
 import 'package:rick_and_morty_wiki/characters/domain/characters_use_cases.dart';
+import 'package:rick_and_morty_wiki/core/infra/favorites_service.dart';
 import 'package:rick_and_morty_wiki/core/infra/service_locator.dart';
 import 'package:rick_and_morty_wiki/core/theme/app_typography.dart';
 import 'package:rick_and_morty_wiki/core/theme/color_theme.dart';
@@ -18,6 +19,15 @@ class CharacterDetails extends HookWidget {
       characterId,
     ], () => sl<GetCharacterDetails>().call(characterId));
     final characterDetails = characterDetailsQuery.data;
+
+    final favoritesService = sl<FavoritesService>();
+    final isFavorite = useState<bool>(false);
+    useEffect(() {
+      favoritesService.isFavorite(characterId).then((value) {
+        isFavorite.value = value;
+      });
+      return null;
+    }, []);
 
     if (characterDetails == null) {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -118,12 +128,19 @@ class CharacterDetails extends HookWidget {
           style: ButtonStyle(
             backgroundColor: WidgetStatePropertyAll<Color>(ColorTheme.primary),
           ),
-          onPressed: () {},
+          onPressed: () async {
+            await favoritesService.toggleFavorite(characterId);
+            isFavorite.value = !isFavorite.value;
+          },
           child: Row(
             spacing: 8,
             children: [
-              Icon(Icons.favorite_border),
-              Text("Adicionar aos favoritos"),
+              Icon(isFavorite.value ? Icons.favorite : Icons.favorite_border),
+              Text(
+                isFavorite.value
+                    ? "Remover dos favoritos"
+                    : "Adicionar aos favoritos",
+              ),
             ],
           ),
         ),

@@ -5,6 +5,7 @@ import 'package:rick_and_morty_wiki/characters/data/character_repository_impl.da
 import 'package:rick_and_morty_wiki/characters/domain/character_repository.dart';
 import 'package:rick_and_morty_wiki/characters/domain/characters_use_cases.dart';
 import 'package:rick_and_morty_wiki/characters/presentation/controllers/character_controllers.dart';
+import 'package:rick_and_morty_wiki/core/infra/favorites_service.dart';
 
 final sl = GetIt.instance;
 
@@ -32,5 +33,8 @@ Future<void> init() async {
   );
 
   sl.registerLazySingleton(() => GetCharacters(sl()));
+
   sl.registerLazySingleton(() => GetCharacterDetails(sl()));
+  
+  sl.registerLazySingleton(() => FavoritesService());
 }
