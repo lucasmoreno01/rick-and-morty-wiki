@@ -103,7 +103,7 @@ class CharacterDetails extends HookWidget {
                       style: AppTypography.regular22,
                     ),
                   Text(
-                    'Aparece em ${characterDetails.episode.length} episódios',
+                    'Aparece em ${characterDetails.episode.length} ${characterDetails.episode.length > 1 ? "episódios" : "episódio"}',
                     style: AppTypography.regular22,
                   ),
                 ],
