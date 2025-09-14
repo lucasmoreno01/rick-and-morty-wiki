@@ -6,7 +6,7 @@ import 'package:rick_and_morty_wiki/core/theme/color_theme.dart';
 enum CharacterStatus {
   Alive(label: 'Vivo', color: ColorTheme.tertiary),
   Dead(label: 'Morto', color: Colors.red),
-  unknown(label: 'Desconhecido', color: Colors.grey);
+  unknown(label: 'Status desconhecido', color: Colors.grey);
 
   final String label;
   final Color color;

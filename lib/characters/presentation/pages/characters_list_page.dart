@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fquery/fquery.dart';
+import 'package:provider/provider.dart';
 import 'package:rick_and_morty_wiki/characters/domain/character_entity.dart';
-import 'package:rick_and_morty_wiki/characters/presentation/widgets/character_card.dart';
-import 'package:rick_and_morty_wiki/core/infra/service_locator.dart';
 import 'package:rick_and_morty_wiki/characters/domain/characters_use_cases.dart';
-import 'package:rick_and_morty_wiki/core/infra/favorites_service.dart';
+import 'package:rick_and_morty_wiki/characters/presentation/widgets/character_card.dart';
+import 'package:rick_and_morty_wiki/core/infra/stores/favorites_store.dart';
+import 'package:rick_and_morty_wiki/core/infra/service_locator.dart';
 import 'package:rick_and_morty_wiki/core/theme/app_typography.dart';
 import 'package:rick_and_morty_wiki/core/theme/color_theme.dart';
 
@@ -26,7 +27,7 @@ class CharactersListPage extends HookWidget {
         );
 
     final showFavorites = useState(false);
-    final favorites = useState<List<int>>([]);
+    final favoritesStore = context.watch<FavoritesStore>();
 
     useEffect(() {
       void onScroll() {
@@ -44,15 +45,6 @@ class CharactersListPage extends HookWidget {
       return () => scrollController.removeListener(onScroll);
     }, [scrollController, charactersQuery]);
 
-    useEffect(() {
-      if (showFavorites.value) {
-        sl<FavoritesService>().getFavorites().then((ids) {
-          favorites.value = ids;
-        });
-      }
-      return null;
-    }, [showFavorites.value]);
-
     if (charactersQuery.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -67,7 +59,9 @@ class CharactersListPage extends HookWidget {
         charactersQuery.data?.pages.expand((p) => p).toList() ?? [];
 
     final charactersToShow = showFavorites.value
-        ? allCharacters.where((c) => favorites.value.contains(c.id)).toList()
+        ? allCharacters
+              .where((c) => favoritesStore.favorites.contains(c.id))
+              .toList()
         : allCharacters;
 
     return Scaffold(

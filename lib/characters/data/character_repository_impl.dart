@@ -10,13 +10,12 @@ class CharacterRepositoryImpl implements CharacterRepository {
   @override
   Future<List<CharacterEntity>> getCharacters({int page = 1}) async {
     final response = await remoteDataSource.getCharacters(page: page);
-    return response.results; 
+    return response.results;
   }
-  
- @override
-Future<CharacterEntity> getCharacterById(int id) async {
-  final response = await remoteDataSource.getCharacterById(id);
-  return response; 
-}
 
+  @override
+  Future<CharacterEntity> getCharacterById(int id) async {
+    final response = await remoteDataSource.getCharacterById(id);
+    return response;
+  }
 }

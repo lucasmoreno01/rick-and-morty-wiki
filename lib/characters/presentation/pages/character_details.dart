@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
+import 'package:provider/provider.dart';
 import 'package:rick_and_morty_wiki/characters/domain/characters_use_cases.dart';
-import 'package:rick_and_morty_wiki/core/infra/favorites_service.dart';
 import 'package:rick_and_morty_wiki/core/infra/service_locator.dart';
+import 'package:rick_and_morty_wiki/core/infra/stores/favorites_store.dart';
 import 'package:rick_and_morty_wiki/core/theme/app_typography.dart';
 import 'package:rick_and_morty_wiki/core/theme/color_theme.dart';
 
@@ -20,14 +21,8 @@ class CharacterDetails extends HookWidget {
     ], () => sl<GetCharacterDetails>().call(characterId));
     final characterDetails = characterDetailsQuery.data;
 
-    final favoritesService = sl<FavoritesService>();
-    final isFavorite = useState<bool>(false);
-    useEffect(() {
-      favoritesService.isFavorite(characterId).then((value) {
-        isFavorite.value = value;
-      });
-      return null;
-    }, []);
+    final favoritesStore = context.watch<FavoritesStore>();
+    final isFavorite = favoritesStore.isFavorite(characterId);
 
     if (characterDetails == null) {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -40,7 +35,6 @@ class CharacterDetails extends HookWidget {
           characterDetails.name,
           style: AppTypography.bold25.copyWith(color: Colors.white),
         ),
-
         leading: IconButton(
           icon: Icon(Icons.chevron_left, size: 32, color: Colors.white),
           onPressed: () => Navigator.pop(context),
@@ -51,12 +45,11 @@ class CharacterDetails extends HookWidget {
         child: Column(
           spacing: 16,
           crossAxisAlignment: CrossAxisAlignment.start,
-
           children: [
             SizedBox(
               width: double.infinity,
               child: ClipRRect(
-                borderRadius: BorderRadiusGeometry.vertical(
+                borderRadius: BorderRadius.vertical(
                   bottom: Radius.circular(32),
                 ),
                 child: Image.network(
@@ -89,19 +82,16 @@ class CharacterDetails extends HookWidget {
                         color: ColorTheme.secondary,
                         textColor: Colors.white,
                       ),
-                      if (characterDetails.status.name != 'unknown')
-                        _InfoCard(
-                          label: characterDetails.status.label,
-                          color: characterDetails.status.color,
-                          textColor: characterDetails.status.name == "Dead"
-                              ? Colors.white
-                              : Colors.black87,
-                        ),
+                      _InfoCard(
+                        label: characterDetails.status.label,
+                        color: characterDetails.status.color,
+                        textColor: characterDetails.status.name != "Alive"
+                            ? Colors.white
+                            : Colors.black87,
+                      ),
                     ],
                   ),
-
                   SizedBox(height: 16),
-
                   if (characterDetails.origin.name != 'unknown')
                     Text(
                       'Origem: ${characterDetails.origin.name}',
@@ -128,16 +118,15 @@ class CharacterDetails extends HookWidget {
           style: ButtonStyle(
             backgroundColor: WidgetStatePropertyAll<Color>(ColorTheme.primary),
           ),
-          onPressed: () async {
-            await favoritesService.toggleFavorite(characterId);
-            isFavorite.value = !isFavorite.value;
+          onPressed: () {
+            favoritesStore.toggleFavorite(characterId);
           },
           child: Row(
             spacing: 8,
             children: [
-              Icon(isFavorite.value ? Icons.favorite : Icons.favorite_border),
+              Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
               Text(
-                isFavorite.value
+                isFavorite
                     ? "Remover dos favoritos"
                     : "Adicionar aos favoritos",
               ),
