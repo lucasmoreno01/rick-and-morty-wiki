@@ -26,14 +26,4 @@ class AppTypography {
     fontWeight: FontWeight.w700,
     fontSize: 25,
   );
-
-  static TextStyle bold32 = GoogleFonts.nunito(
-    fontWeight: FontWeight.w700,
-    fontSize: 32,
-  );
-
-  static TextStyle bold50 = GoogleFonts.nunito(
-    fontWeight: FontWeight.w700,
-    fontSize: 50,
-  );
 }
