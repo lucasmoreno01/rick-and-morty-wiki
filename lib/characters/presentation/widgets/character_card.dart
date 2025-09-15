@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rick_and_morty_wiki/characters/domain/character_entity.dart';
-import 'package:rick_and_morty_wiki/characters/domain/charater_status.dart';
+import 'package:rick_and_morty_wiki/characters/domain/character_status.dart';
 import 'package:rick_and_morty_wiki/core/app_routes.dart';
 import 'package:rick_and_morty_wiki/core/theme/app_typography.dart';
 import 'package:rick_and_morty_wiki/core/theme/color_theme.dart';
